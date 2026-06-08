@@ -96,3 +96,37 @@ def test_delete_all_tasks_on_empty_database(client):
 
     assert resp.status_code == 204
     assert client.get("/tasks/").json() == []
+
+
+def test_complete_task_marks_as_done(client):
+    task = _create_task(client, status="pending")
+
+    resp = client.patch(f"/tasks/{task['id']}/complete")
+
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "done"
+
+
+def test_complete_task_from_in_progress(client):
+    task = _create_task(client, status="in_progress")
+
+    resp = client.patch(f"/tasks/{task['id']}/complete")
+
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "done"
+
+
+def test_complete_already_done_task_returns_400(client):
+    task = _create_task(client, status="done")
+
+    resp = client.patch(f"/tasks/{task['id']}/complete")
+
+    assert resp.status_code == 400
+    assert resp.json()["detail"] == "Task is already completed"
+
+
+def test_complete_nonexistent_task_returns_404(client):
+    resp = client.patch("/tasks/9999/complete")
+
+    assert resp.status_code == 404
+    assert resp.json()["detail"] == "Task not found"
