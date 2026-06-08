@@ -82,12 +82,16 @@ La API expone 6 endpoints bajo el prefijo `/tasks`.
 |--------|--------------------------|
 | Método | `GET`                    |
 | Ruta   | `/tasks/`                |
-| Params | Ninguno                  |
+| Params | `limit` (int, opcional) — número máximo de tareas a devolver (≥ 1) |
 
 **Ejemplo curl:**
 
 ```bash
+# Todas las tareas
 curl -X GET http://127.0.0.1:8000/tasks/
+
+# Limitar a 5 tareas
+curl -X GET "http://127.0.0.1:8000/tasks/?limit=5"
 ```
 
 **Ejemplo de respuesta** (`200 OK`):
