@@ -80,6 +80,34 @@ def test_update_done_task_status_change_blocked(client):
     assert resp.json()["detail"] == "Cannot update a completed task"
 
 
+def test_list_tasks_with_limit(client):
+    _create_task(client, title="Task 1")
+    _create_task(client, title="Task 2")
+    _create_task(client, title="Task 3")
+
+    resp = client.get("/tasks/", params={"limit": 2})
+
+    assert resp.status_code == 200
+    assert len(resp.json()) == 2
+
+
+def test_list_tasks_without_limit_returns_all(client):
+    _create_task(client, title="Task 1")
+    _create_task(client, title="Task 2")
+    _create_task(client, title="Task 3")
+
+    resp = client.get("/tasks/")
+
+    assert resp.status_code == 200
+    assert len(resp.json()) == 3
+
+
+def test_list_tasks_limit_invalid_returns_422(client):
+    resp = client.get("/tasks/", params={"limit": 0})
+
+    assert resp.status_code == 422
+
+
 def test_delete_all_tasks_clears_database(client):
     _create_task(client, title="Task 1")
     _create_task(client, title="Task 2")
