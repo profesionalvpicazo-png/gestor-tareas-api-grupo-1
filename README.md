@@ -74,7 +74,7 @@ La documentación interactiva (Swagger UI) estará en `http://127.0.0.1:8000/doc
 
 ## Endpoints
 
-La API expone 6 endpoints bajo el prefijo `/tasks`.
+La API expone 7 endpoints bajo el prefijo `/tasks`.
 
 ### 1. Listar todas las tareas
 
@@ -270,6 +270,50 @@ curl -X DELETE http://127.0.0.1:8000/tasks/1
 ```
 
 **Respuesta exitosa:** `204 No Content` (sin cuerpo).
+
+**Respuesta de error** (`404 Not Found`):
+
+```json
+{
+  "detail": "Task not found"
+}
+```
+
+---
+
+### 7. Marcar una tarea como completada
+
+| Campo  | Valor                                |
+|--------|--------------------------------------|
+| Método | `PATCH`                              |
+| Ruta   | `/tasks/{task_id}/complete`          |
+| Params | `task_id` (int) — ruta, obligatorio  |
+
+**Ejemplo curl:**
+
+```bash
+curl -X PATCH http://127.0.0.1:8000/tasks/1/complete
+```
+
+**Ejemplo de respuesta** (`200 OK`):
+
+```json
+{
+  "id": 1,
+  "title": "Comprar materiales",
+  "description": "Ir a la ferretería",
+  "status": "done",
+  "created_at": "2026-05-27T10:00:00"
+}
+```
+
+**Respuesta de error** (`400 Bad Request` — tarea ya completada):
+
+```json
+{
+  "detail": "Task is already completed"
+}
+```
 
 **Respuesta de error** (`404 Not Found`):
 

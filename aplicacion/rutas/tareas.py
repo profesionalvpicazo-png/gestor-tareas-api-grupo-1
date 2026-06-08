@@ -144,3 +144,35 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
     db.delete(task)
     db.commit()
+
+
+@router.patch("/{task_id}/complete", response_model=TaskResponse)
+def complete_task(task_id: int, db: Session = Depends(get_db)):
+    """Marca una tarea como completada (estado ``done``).
+
+    Args:
+        task_id (int): Identificador único de la tarea a completar.
+        db (Session): Sesión de SQLAlchemy inyectada por el
+            sistema de dependencias de FastAPI.
+
+    Returns:
+        Task: La tarea con el estado actualizado a ``done``.
+
+    Raises:
+        HTTPException: Error 404 si no existe una tarea con el
+            identificador indicado.
+        HTTPException: Error 400 si la tarea ya se encuentra en
+            estado ``done``.
+    """
+    task = db.query(Task).filter(Task.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+    if task.status == TaskStatus.done:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Task is already completed",
+        )
+    task.status = TaskStatus.done
+    db.commit()
+    db.refresh(task)
+    return task
